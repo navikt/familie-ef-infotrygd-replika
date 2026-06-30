@@ -1,0 +1,47 @@
+# Felles variabler
+NAIS_APP_NAME: familie-ef-infotrygd-replika
+DEPLOY_ENV: dev
+
+# Spring konfigurasjon
+spring:
+  application:
+    name: familie-ef-infotrygd-replika
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${AZURE_OPENID_CONFIG_ISSUER}
+          audiences: ${AZURE_APP_CLIENT_ID}
+
+  # Database konfigurasjon
+  datasource:
+    url: ${DB_JDBC_URL}
+    hikari:
+      maximum-pool-size: 20
+      connection-test-query: "select 1"
+      max-lifetime: 90000
+      minimum-idle: 1
+
+
+# Management og health endepunkter
+management:
+  endpoint:
+    health:
+      show-details: always
+      probes:
+        enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: health,prometheus
+      base-path: /internal
+
+# Azure AD konfigurasjon
+azure:
+  app:
+    tenant:
+      id: ${AZURE_APP_TENANT_ID}
+    client:
+      id: ${AZURE_APP_CLIENT_ID}
+      secret: ${AZURE_APP_CLIENT_SECRET}

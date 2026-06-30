@@ -1,0 +1,67 @@
+apiVersion: "nais.io/v1alpha1"
+kind: "Application"
+metadata:
+  name: familie-ef-infotrygd-replika
+  namespace: teamfamilie
+  labels:
+    team: teamfamilie
+
+spec:
+  image: {{ image }}
+  ingresses:
+    - https://familie-ef-infotrygd-replika.intern.dev.nav.no
+  liveness:
+    path: /internal/status/isAlive
+    initialDelay: 30
+    failureThreshold: 10
+  readiness:
+    path: /internal/status/isAlive
+    initialDelay: 30
+    failureThreshold: 10
+  prometheus:
+    enabled: true
+    path: /internal/prometheus
+  replicas:
+    min: 2
+    max: 2
+  tokenx:
+    enabled: true
+  resources:
+    limits:
+      memory: 1024Mi
+    requests:
+      memory: 512Mi
+      cpu: 50m
+  gcp:
+    sqlInstances:
+      - name: familie-ef-infotrygd-replika
+        type: POSTGRES_18
+        tier: db-g1-small
+        diskAutoresize: true
+        cascadingDelete: false
+        highAvailability: false
+        pointInTimeRecovery: true
+        maintenance:
+          day: 7
+          hour: 23
+        databases:
+          - name: familie-ef-infotrygd-replika
+            envVarPrefix: DB
+  accessPolicy:
+    inbound:
+      rules:
+        - application: familie-ef-sak
+  azure:
+    application:
+      enabled: true
+  observability:
+    logging:
+      destinations:
+        - id: loki
+        - id: elastic
+    autoInstrumentation:
+      enabled: true
+      runtime: java
+  env:
+    - name: SPRING_PROFILES_ACTIVE
+      value: dev
