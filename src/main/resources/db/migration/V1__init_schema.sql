@@ -87,8 +87,10 @@ create table t_rolle (
 );
 
 create table t_ef (
-    vedtak_id numeric(10, 0) not null primary key,
-    tidspunkt_reg timestamp,
+    vedtak_id numeric(10, 0) not null,
+    -- PK er egentlig (vedtak_id, tidspunkt_reg) i Oracle, siden det finnes historikk-rader
+    -- for samme vedtak_id med ulik tidspunkt_reg.
+    tidspunkt_reg timestamp not null default current_timestamp,
     samordning char(1),
     aktivitet char(1),
     overgang char(1),
@@ -105,7 +107,8 @@ create table t_ef (
     ant_mnd numeric(2, 0),
     sam_fradrag numeric(6, 0),
     opprettet timestamp default current_timestamp,
-    oppdatert timestamp default current_timestamp
+    oppdatert timestamp default current_timestamp,
+    primary key (vedtak_id, tidspunkt_reg)
 );
 
 create table t_beregn_grl (
@@ -115,7 +118,10 @@ create table t_beregn_grl (
     fom date not null,
     tom date,
     belop numeric(11, 2) not null,
-    brukerid varchar(8)
+    brukerid varchar(8) not null,
+    opprettet timestamp default current_timestamp,
+    oppdatert timestamp default current_timestamp,
+    db_splitt char(2) default '  '
 );
 
 create table sa_sak_10 (
