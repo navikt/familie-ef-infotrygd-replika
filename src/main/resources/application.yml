@@ -13,6 +13,18 @@ spring:
         jwt:
           issuer-uri: ${AZURE_OPENID_CONFIG_ISSUER}
           audiences: ${AZURE_APP_CLIENT_ID}
+      # Client credentials mot historisk-exodus (on-prem), se ExodusClientConfig.
+      client:
+        registration:
+          exodus:
+            provider: azure
+            authorization-grant-type: client_credentials
+            client-id: ${AZURE_APP_CLIENT_ID}
+            client-secret: ${AZURE_APP_CLIENT_SECRET}
+            scope: ${EXODUS_SCOPE}
+        provider:
+          azure:
+            token-uri: ${AZURE_OPENID_CONFIG_TOKEN_ENDPOINT}
 
   # Database konfigurasjon (Postgres/Cloud SQL på GCP)
   datasource:
@@ -62,3 +74,10 @@ azure:
     client:
       id: ${AZURE_APP_CLIENT_ID}
       secret: ${AZURE_APP_CLIENT_SECRET}
+
+# Klient mot historisk-exodus (replikering av statiske Infotrygd-tabeller on-prem -> GCP)
+exodus:
+  base-url: ${EXODUS_BASE_URL}
+  batch-storrelse: 1000
+  scheduler-cron: 0 */5 * * * *
+  maks-sider-per-kjoring: 500

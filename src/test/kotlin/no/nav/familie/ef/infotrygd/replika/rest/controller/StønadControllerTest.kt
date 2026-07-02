@@ -8,6 +8,7 @@ import no.nav.familie.ef.infotrygd.replika.service.StønadService
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.security.oauth2.client.autoconfigure.servlet.OAuth2ClientWebSecurityAutoConfiguration
 import org.springframework.boot.security.oauth2.server.resource.autoconfigure.web.OAuth2ResourceServerWebSecurityAutoConfiguration
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest
@@ -18,7 +19,13 @@ import org.springframework.test.web.servlet.post
 import tools.jackson.databind.ObjectMapper
 import tools.jackson.module.kotlin.readValue
 
-@WebMvcTest(StønadController::class, excludeAutoConfiguration = [OAuth2ResourceServerWebSecurityAutoConfiguration::class])
+@WebMvcTest(
+    StønadController::class,
+    excludeAutoConfiguration = [
+        OAuth2ResourceServerWebSecurityAutoConfiguration::class,
+        OAuth2ClientWebSecurityAutoConfiguration::class,
+    ],
+)
 @AutoConfigureMockMvc(addFilters = false)
 @ActiveProfiles("integrasjonstest")
 class StønadControllerTest {

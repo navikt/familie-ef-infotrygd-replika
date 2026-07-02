@@ -24,6 +24,7 @@ spec:
   replicas:
     min: 2
     max: 2
+  leaderElection: true
   tokenx:
     enabled: true
   resources:
@@ -51,6 +52,11 @@ spec:
     inbound:
       rules:
         - application: familie-ef-sak
+    outbound:
+      # historisk-exodus kjører on-prem (FSS) og er ikke en NAIS-app i denne (GCP-)klyngen, så
+      # kallet må åpnes som ekstern host. Bytt ut med faktisk ingress-URL når exodus er deployet.
+      external:
+        - host: historisk-exodus.intern.dev.nav.no
   azure:
     application:
       enabled: true
@@ -65,3 +71,8 @@ spec:
   env:
     - name: SPRING_PROFILES_ACTIVE
       value: dev
+    # Fylles inn når historisk-exodus er deployet on-prem, se ExodusClientConfig/application.yml.
+    - name: EXODUS_BASE_URL
+      value: https://historisk-exodus.intern.dev.nav.no
+    - name: EXODUS_SCOPE
+      value: api://prod-fss.teamfamilie.historisk-exodus/.default

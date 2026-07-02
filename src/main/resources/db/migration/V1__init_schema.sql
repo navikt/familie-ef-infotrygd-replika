@@ -58,7 +58,8 @@ create table t_endring (
     vedtak_id numeric(10, 0) not null,
     kode varchar(2) not null,
     opprettet timestamp default current_timestamp,
-    oppdatert timestamp default current_timestamp
+    oppdatert timestamp default current_timestamp,
+    primary key (vedtak_id, kode)
 );
 
 create table t_rolle (
@@ -83,7 +84,8 @@ create table t_rolle (
     bt_s_sum numeric(5, 0),
     bt_s_antall numeric(2, 0),
     opprettet timestamp default current_timestamp,
-    oppdatert timestamp default current_timestamp
+    oppdatert timestamp default current_timestamp,
+    primary key (vedtak_id, type, tidspunkt_reg, person_lopenr_r)
 );
 
 create table t_ef (
@@ -121,7 +123,8 @@ create table t_beregn_grl (
     brukerid varchar(8) not null,
     opprettet timestamp default current_timestamp,
     oppdatert timestamp default current_timestamp,
-    db_splitt char(2) default '  '
+    db_splitt char(2) default '  ',
+    primary key (vedtak_id, type_belop, tidspunkt_reg)
 );
 
 create table sa_sak_10 (
@@ -177,7 +180,7 @@ create table sa_sak_10 (
     kilde_is varchar(12) default ' ',
     region char(1) default ' ',
     db_splitt char(2) default ' ',
-    id_sak numeric
+    id_sak numeric not null primary key
 );
 
 create index idx_t_lopenr_fnr_personnr on t_lopenr_fnr (personnr);
@@ -186,3 +189,17 @@ create index idx_t_vedtak_stonad_id on t_vedtak (stonad_id);
 create index idx_t_vedtak_person_lopenr on t_vedtak (person_lopenr);
 create index idx_t_rolle_person_lopenr_r on t_rolle (person_lopenr_r);
 create index idx_sa_sak_10_f_nr on sa_sak_10 (f_nr);
+
+-- Styringstabell for replikering fra historisk-exodus (on-prem) til denne GCP-postgres-basen.
+--
+-- iterator er en cursor levert av exodus sitt /api/hentUttrekk-endepunkt, og brukes
+-- til å be om neste side med data for en gitt tabell. job_status brukes til å registrere at exodus
+-- har re-eksportert tabellen fra Oracle (NY_BASELINE), som gjør at den lokale iteratoren er ugyldig
+-- og at tabellen må trunkeres og replikeres på nytt fra bunnen av.
+create table exodus_status (
+    tabell varchar(64) not null primary key,
+    iterator varchar(256),
+    job_status varchar(32) not null default 'OK',
+    antall_rader_hentet bigint not null default 0,
+    sist_oppdatert timestamp not null default current_timestamp
+);

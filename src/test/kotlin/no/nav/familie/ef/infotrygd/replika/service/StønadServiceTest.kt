@@ -41,7 +41,9 @@ internal class StønadServiceTest {
         leggInnStønad(3, StønadType.BARNETILSYN, null)
         leggInnVedtak(3, StønadType.BARNETILSYN)
 
-        jdbcTemplate.update("INSERT INTO sa_sak_10 (f_nr, s10_kapittelnr, s10_valg) VALUES ('${IDENT4.reverserFnr()}', 'EF', 'OG')")
+        jdbcTemplate.update(
+            "INSERT INTO sa_sak_10 (id_sak, f_nr, s10_kapittelnr, s10_valg) VALUES (1, '${IDENT4.reverserFnr()}', 'EF', 'OG')",
+        )
     }
 
     private fun leggInnStønad(
