@@ -19,6 +19,10 @@ class ExodusKlientScheduler(
 
     @Scheduled(cron = "\${exodus.scheduler-cron}")
     fun replikerAlleTabeller() {
+        if (!exodusProperties.schedulerEnabled) {
+            logger.debug("Scheduler for replikering er avskrudd (exodus.scheduler-enabled=false), gjør ingenting")
+            return
+        }
         if (!lederVelger.erLeder()) {
             return
         }

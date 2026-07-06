@@ -8,9 +8,20 @@ import org.junit.jupiter.api.Test
 class ExodusKlientSchedulerTest {
     private val exodusKlientService = mockk<ExodusKlientService>()
     private val lederVelger = mockk<LederVelger>()
-    private val exodusProperties = ExodusProperties(baseUrl = "http://localhost", maksSiderPerKjoring = 3)
+    private val exodusProperties =
+        ExodusProperties(baseUrl = "http://localhost", maksSiderPerKjoring = 3, schedulerEnabled = true)
 
     private val scheduler = ExodusKlientScheduler(exodusKlientService, lederVelger, exodusProperties)
+
+    @Test
+    fun `gjør ingenting når scheduler er avskrudd`() {
+        val avskruddProperties = exodusProperties.copy(schedulerEnabled = false)
+        val avskruddScheduler = ExodusKlientScheduler(exodusKlientService, lederVelger, avskruddProperties)
+
+        avskruddScheduler.replikerAlleTabeller()
+
+        verify(exactly = 0) { exodusKlientService.replikerNesteSide(any()) }
+    }
 
     @Test
     fun `gjør ingenting når poden ikke er leder`() {

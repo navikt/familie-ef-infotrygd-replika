@@ -21,4 +21,10 @@ data class ExodusProperties(
     val schedulerCron: String = "0 */5 * * * *",
     /** Maks antall sider (kall mot exodus) som hentes for én tabell per scheduler-kjøring. */
     val maksSiderPerKjoring: Int = 500,
+    /**
+     * Om scheduleren faktisk skal kjøre replikering. Default false slik at en nydeployet
+     * instans ikke begynner å lese data automatisk - må skrus på eksplisitt (f.eks. via
+     * miljøvariabelen EXODUS_SCHEDULER_ENABLED).
+     */
+    val schedulerEnabled: Boolean = false,
 )
