@@ -272,6 +272,12 @@
                     </dependency>
                 </dependencies>
             </plugin>
+
+            <!-- Repackager jar-en til en kjørbar Spring Boot fat-jar med Main-Class i manifestet -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
         </plugins>
     </build>
 
