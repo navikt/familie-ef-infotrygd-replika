@@ -28,6 +28,8 @@ class LogFilter(
             "/internal/status/isAlive",
             "/internal/prometheus",
             "/api/ping",
+            "/internal/health/liveness",
+            "/internal/health/readiness",
         )
 
     override fun doFilter(
