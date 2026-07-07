@@ -53,10 +53,13 @@ spec:
       rules:
         - application: familie-ef-sak
     outbound:
+      rules:
+        - application: logging
+          namespace: nais-system
       # historisk-exodus kjører on-prem (FSS) og er ikke en NAIS-app i denne (GCP-)klyngen, så
       # kallet må åpnes som ekstern host. Bytt ut med faktisk ingress-URL når exodus er deployet.
       external:
-        - host: historisk-exodus.intern.dev.nav.no
+        - host: historisk-exodus-ef.intern.dev.nav.no
   azure:
     application:
       enabled: true
