@@ -26,7 +26,9 @@ class ExodusKlientScheduler(
         if (!lederVelger.erLeder()) {
             return
         }
+        logger.info("Starter scheduler-kjøring, replikerer ${ExodusTabell.entries.size} tabeller fra exodus")
         ExodusTabell.entries.forEach(::replikerTabellFullstendig)
+        logger.info("Scheduler-kjøring ferdig")
     }
 
     /** Henter sider for én tabell helt til den er ajour, eller til sidetaket for én kjøring er nådd. */
@@ -37,6 +39,14 @@ class ExodusKlientScheduler(
             while (flereSider && antallSider < exodusProperties.maksSiderPerKjoring) {
                 flereSider = exodusKlientService.replikerNesteSide(tabell)
                 antallSider++
+            }
+            if (flereSider) {
+                logger.info(
+                    "Tabell ${tabell.tabellNavn}: hentet $antallSider sider, men maksSiderPerKjoring " +
+                        "(maksSiderPerKjoring=${exodusProperties.maksSiderPerKjoring}) ble nådd - fortsetter neste kjøring",
+                )
+            } else {
+                logger.info("Tabell ${tabell.tabellNavn}: ajour etter $antallSider hentede sider")
             }
         } catch (e: Exception) {
             // Ingenting committes fra en feilet side - scheduleren prøver denne tabellen på nytt
