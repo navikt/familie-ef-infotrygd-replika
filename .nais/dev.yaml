@@ -59,7 +59,7 @@ spec:
       # historisk-exodus kjører on-prem (FSS) og er ikke en NAIS-app i denne (GCP-)klyngen, så
       # kallet må åpnes som ekstern host. Må matche EXODUS_BASE_URL under.
       external:
-        - host: historisk-exodus-ef.intern.dev.nav.no
+        - host: historisk-exodus-ef.dev-fss-pub.nais.io
   azure:
     application:
       enabled: true
