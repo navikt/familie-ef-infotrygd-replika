@@ -56,6 +56,9 @@ spec:
       rules:
         - application: logging
           namespace: nais-system
+        - application: historisk-exodus-ef
+          namespace: teamfamilie
+          cluster: dev-fss
       # historisk-exodus kjører on-prem (FSS) og er ikke en NAIS-app i denne (GCP-)klyngen, så
       # kallet må åpnes som ekstern host. Må matche EXODUS_BASE_URL under.
       external:
@@ -74,12 +77,9 @@ spec:
   env:
     - name: SPRING_PROFILES_ACTIVE
       value: dev
-    # Egen exodus-app for enslig forsørger-domenet, se ExodusClientConfig/application.yml.
     - name: EXODUS_BASE_URL
       value: https://historisk-exodus-ef.intern.dev.nav.no
     - name: EXODUS_SCOPE
       value: api://dev-fss.teamfamilie.historisk-exodus-ef/.default
-    # Scheduleren er avskrudd som default (se ExodusProperties.schedulerEnabled) - skrus på her
-    # for å teste replikering i dev.
     - name: EXODUS_SCHEDULER_ENABLED
       value: "true"
