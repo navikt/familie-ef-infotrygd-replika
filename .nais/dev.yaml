@@ -78,7 +78,7 @@ spec:
     - name: SPRING_PROFILES_ACTIVE
       value: dev
     - name: EXODUS_BASE_URL
-      value: https://historisk-exodus-ef.intern.dev.nav.no
+      value: https://historisk-exodus-ef.dev-fss-pub.nais.io
     - name: EXODUS_SCOPE
       value: api://dev-fss.teamfamilie.historisk-exodus-ef/.default
     - name: EXODUS_SCHEDULER_ENABLED
