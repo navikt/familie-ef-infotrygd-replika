@@ -1,5 +1,8 @@
 package no.nav.familie.ef.infotrygd.replika.exodus
 
+import com.fasterxml.jackson.annotation.JsonSetter
+import com.fasterxml.jackson.annotation.Nulls
+
 /**
  * HTTP-kontrakt mot historisk-exodus, verifisert mot kildekoden i navikt/historisk-exodus
  * (UttrekkController/Uttrekk.kt). Radene i svaret fra /api/hentUttrekk kommer posisjonelt
@@ -20,7 +23,7 @@ data class HentUttrekkResponse(
     /** Cursor som skal brukes i neste kall. Alltid satt - uendret dersom det ikke finnes mer data. */
     val iterator: String = "",
     val schema: SchemaDto = SchemaDto(emptyList()),
-    /** Én rad per element, i samme rekkefølge som schema.kolonner. */
+    @JsonSetter(contentNulls = Nulls.SET)
     val innhold: List<List<String?>> = emptyList(),
 )
 
