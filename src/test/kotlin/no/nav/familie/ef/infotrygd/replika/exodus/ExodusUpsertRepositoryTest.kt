@@ -78,6 +78,17 @@ class ExodusUpsertRepositoryTest {
     }
 
     @Test
+    fun `upsert fjerner nulltegn fra tekstverdier for a unnga postgres-feil`() {
+        upsertRepository.upsert(
+            ExodusTabell.T_LOPENR_FNR,
+            listOf(mapOf("person_lopenr" to "1", "personnr" to "01234567890\u0000")),
+        )
+
+        val rad = jdbcTemplate.queryForMap("SELECT * FROM t_lopenr_fnr WHERE person_lopenr = 1")
+        assertThat(rad["personnr"]).isEqualTo("01234567890")
+    }
+
+    @Test
     fun `truncate tømmer tabellen`() {
         upsertRepository.upsert(
             ExodusTabell.T_LOPENR_FNR,

@@ -44,11 +44,23 @@ class ExodusUpsertRepository(
 
         val parametre =
             rader
-                .map { rad -> MapSqlParameterSource(rad.mapKeys { (kolonnenavn, _) -> kolonnenavn.lowercase() }) }
-                .toTypedArray()
+                .map { rad ->
+                    val saneRad =
+                        rad
+                            .mapKeys { (kolonnenavn, _) -> kolonnenavn.lowercase() }
+                            .mapValues { (_, verdi) -> fjernNulltegn(verdi) }
+                    MapSqlParameterSource(saneRad)
+                }.toTypedArray()
 
         jdbcTemplate.batchUpdate(sql, parametre)
     }
+
+    /**
+     * Postgres tillater aldri NUL-byte (0x00) i tekstfelt, uansett encoding. Enkelte Oracle
+     * CHAR-kolonner har vist seg å inneholde slike tegn (trolig rester fra fast feltlengde),
+     * og feiler da innsettingen med "invalid byte sequence for encoding UTF8: 0x00".
+     */
+    private fun fjernNulltegn(verdi: String?): String? = verdi?.replace("\u0000", "")
 
     /** Henter Postgres sitt interne typenavn (udt_name) per kolonne, f.eks. numeric/date/timestamp/bpchar/varchar. */
     private fun hentKolonnetyper(tabellNavn: String): Map<String, String> =
