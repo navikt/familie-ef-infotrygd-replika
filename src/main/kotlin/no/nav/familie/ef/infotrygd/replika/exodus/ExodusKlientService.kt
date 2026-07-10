@@ -40,9 +40,10 @@ class ExodusKlientService(
             }
 
         val rader = respons.tilRader()
-        skrivService.lagreSide(tabell, rader, respons.iterator)
+        val flereSider = rader.size >= exodusProperties.batchStorrelse
+        skrivService.lagreSide(tabell, rader, respons.iterator, flereSider)
         logger.debug("Tabell ${tabell.tabellNavn}: lagret side med ${rader.size} rader")
 
-        return rader.size >= exodusProperties.batchStorrelse
+        return flereSider
     }
 }

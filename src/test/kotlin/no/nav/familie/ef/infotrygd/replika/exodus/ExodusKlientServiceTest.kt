@@ -60,6 +60,7 @@ class ExodusKlientServiceTest {
                 ExodusTabell.T_VEDTAK,
                 listOf(mapOf("vedtak_id" to "1"), mapOf("vedtak_id" to "2")),
                 "iterator-2",
+                true,
             )
         }
     }

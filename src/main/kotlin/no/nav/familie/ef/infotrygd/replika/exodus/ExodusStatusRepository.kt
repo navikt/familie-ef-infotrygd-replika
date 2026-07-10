@@ -27,25 +27,31 @@ class ExodusStatusRepository(
                 )
             }.firstOrNull()
 
-    /** Oppdaterer iterator og teller opp antall hentede rader. Setter alltid job_status til OK. */
+    /**
+     * Oppdaterer iterator og teller opp antall hentede rader. Setter job_status til PAGINERER
+     * hvis det finnes flere sider å hente, ellers OK (tabellen er ajour).
+     */
     fun oppdaterIterator(
         tabell: ExodusTabell,
         nyIterator: String?,
         antallNyeRader: Int,
+        flereSider: Boolean,
     ) {
+        val jobStatus = if (flereSider) JobStatus.PAGINERER else JobStatus.OK
         jdbcTemplate.update(
             """
             INSERT INTO exodus_status (tabell, iterator, job_status, antall_rader_hentet, sist_oppdatert)
-            VALUES (:tabell, :iterator, 'OK', :antallNyeRader, current_timestamp)
+            VALUES (:tabell, :iterator, :jobStatus, :antallNyeRader, current_timestamp)
             ON CONFLICT (tabell) DO UPDATE SET
                 iterator = EXCLUDED.iterator,
-                job_status = 'OK',
+                job_status = :jobStatus,
                 antall_rader_hentet = exodus_status.antall_rader_hentet + :antallNyeRader,
                 sist_oppdatert = current_timestamp
             """,
             MapSqlParameterSource()
                 .addValue("tabell", tabell.tabellNavn)
                 .addValue("iterator", nyIterator)
+                .addValue("jobStatus", jobStatus.name)
                 .addValue("antallNyeRader", antallNyeRader),
         )
     }

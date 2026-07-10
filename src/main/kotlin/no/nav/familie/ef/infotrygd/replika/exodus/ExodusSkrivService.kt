@@ -19,9 +19,10 @@ class ExodusSkrivService(
         tabell: ExodusTabell,
         rader: List<Map<String, String?>>,
         nyIterator: String,
+        flereSider: Boolean,
     ) {
         upsertRepository.upsert(tabell, rader)
-        statusRepository.oppdaterIterator(tabell, nyIterator, rader.size)
+        statusRepository.oppdaterIterator(tabell, nyIterator, rader.size, flereSider)
     }
 
     /** Trunkering av tabellen og nullstilling av iterator skjer i samme transaksjon. */

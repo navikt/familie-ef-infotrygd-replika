@@ -4,6 +4,7 @@ import java.time.LocalDateTime
 
 enum class JobStatus {
     OK,
+    PAGINERER,
     NY_BASELINE,
 }
 

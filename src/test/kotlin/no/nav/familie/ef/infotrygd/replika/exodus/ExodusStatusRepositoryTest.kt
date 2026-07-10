@@ -29,7 +29,7 @@ class ExodusStatusRepositoryTest {
 
     @Test
     fun `oppdaterIterator setter inn ny status og teller opp antall rader`() {
-        statusRepository.oppdaterIterator(ExodusTabell.T_VEDTAK, "iterator-1", 100)
+        statusRepository.oppdaterIterator(ExodusTabell.T_VEDTAK, "iterator-1", 100, flereSider = false)
 
         val status = statusRepository.finn(ExodusTabell.T_VEDTAK)
         assertThat(status).isNotNull
@@ -40,8 +40,8 @@ class ExodusStatusRepositoryTest {
 
     @Test
     fun `oppdaterIterator akkumulerer antall rader over flere kall`() {
-        statusRepository.oppdaterIterator(ExodusTabell.T_VEDTAK, "iterator-1", 100)
-        statusRepository.oppdaterIterator(ExodusTabell.T_VEDTAK, "iterator-2", 50)
+        statusRepository.oppdaterIterator(ExodusTabell.T_VEDTAK, "iterator-1", 100, flereSider = true)
+        statusRepository.oppdaterIterator(ExodusTabell.T_VEDTAK, "iterator-2", 50, flereSider = false)
 
         val status = statusRepository.finn(ExodusTabell.T_VEDTAK)
         assertThat(status!!.iterator).isEqualTo("iterator-2")
@@ -49,8 +49,16 @@ class ExodusStatusRepositoryTest {
     }
 
     @Test
+    fun `oppdaterIterator setter status PAGINERER når det finnes flere sider`() {
+        statusRepository.oppdaterIterator(ExodusTabell.T_VEDTAK, "iterator-1", 100, flereSider = true)
+
+        val status = statusRepository.finn(ExodusTabell.T_VEDTAK)
+        assertThat(status!!.jobStatus).isEqualTo(JobStatus.PAGINERER)
+    }
+
+    @Test
     fun `settNyBaseline nullstiller iterator og setter status NY_BASELINE`() {
-        statusRepository.oppdaterIterator(ExodusTabell.T_VEDTAK, "iterator-1", 100)
+        statusRepository.oppdaterIterator(ExodusTabell.T_VEDTAK, "iterator-1", 100, flereSider = false)
 
         statusRepository.settNyBaseline(ExodusTabell.T_VEDTAK)
 
@@ -64,7 +72,7 @@ class ExodusStatusRepositoryTest {
     fun `en påfølgende vellykket oppdatering setter status tilbake til OK`() {
         statusRepository.settNyBaseline(ExodusTabell.T_VEDTAK)
 
-        statusRepository.oppdaterIterator(ExodusTabell.T_VEDTAK, "iterator-1", 10)
+        statusRepository.oppdaterIterator(ExodusTabell.T_VEDTAK, "iterator-1", 10, flereSider = false)
 
         val status = statusRepository.finn(ExodusTabell.T_VEDTAK)
         assertThat(status!!.jobStatus).isEqualTo(JobStatus.OK)
