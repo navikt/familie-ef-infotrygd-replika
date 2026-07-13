@@ -1,0 +1,85 @@
+apiVersion: "nais.io/v1alpha1"
+kind: "Application"
+metadata:
+  name: familie-ef-infotrygd-replika
+  namespace: teamfamilie
+  labels:
+    team: teamfamilie
+
+spec:
+  image: {{ image }}
+  ingresses:
+    - https://familie-ef-infotrygd-replika.intern.nav.no
+  liveness:
+    path: /internal/health/liveness
+    initialDelay: 30
+    failureThreshold: 10
+  readiness:
+    path: /internal/health/readiness
+    initialDelay: 30
+    failureThreshold: 10
+  prometheus:
+    enabled: true
+    path: /internal/prometheus
+  replicas:
+    min: 2
+    max: 2
+  leaderElection: true
+  tokenx:
+    enabled: true
+  resources:
+    limits:
+      memory: 1024Mi
+    requests:
+      memory: 512Mi
+      cpu: 50m
+  gcp:
+    sqlInstances:
+      - name: familie-ef-infotrygd-replika
+        type: POSTGRES_18
+        tier: db-g1-small
+        diskAutoresize: true
+        cascadingDelete: false
+        highAvailability: true
+        pointInTimeRecovery: true
+        maintenance:
+          day: 7
+          hour: 23
+        databases:
+          - name: familie-ef-infotrygd-replika
+            envVarPrefix: DB
+  accessPolicy:
+    inbound:
+      rules:
+        - application: familie-ef-sak
+    outbound:
+      rules:
+        - application: logging
+          namespace: nais-system
+        - application: historisk-exodus-ef
+          namespace: teamfamilie
+          cluster: prod-fss
+      # historisk-exodus kjører on-prem (FSS) og er ikke en NAIS-app i denne (GCP-)klyngen, så
+      # kallet må åpnes som ekstern host. Må matche EXODUS_BASE_URL under.
+      external:
+        - host: historisk-exodus-ef.prod-fss-pub.nais.io
+  azure:
+    application:
+      enabled: true
+  observability:
+    logging:
+      destinations:
+        - id: loki
+        - id: elastic
+    autoInstrumentation:
+      enabled: true
+      runtime: java
+  env:
+    - name: SPRING_PROFILES_ACTIVE
+      value: prod
+    - name: EXODUS_BASE_URL
+      value: https://historisk-exodus-ef.prod-fss-pub.nais.io
+    - name: EXODUS_SCOPE
+      value: api://prod-fss.teamfamilie.historisk-exodus-ef/.default
+    - name: EXODUS_SCHEDULER_ENABLED
+      value: "true"
