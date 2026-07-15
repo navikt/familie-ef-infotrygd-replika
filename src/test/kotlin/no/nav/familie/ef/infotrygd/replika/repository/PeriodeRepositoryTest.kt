@@ -2,6 +2,7 @@ package no.nav.familie.ef.infotrygd.replika.repository
 
 import no.nav.commons.foedselsnummer.FoedselsNr
 import no.nav.familie.ef.infotrygd.replika.model.StønadType
+import no.nav.familie.ef.infotrygd.replika.rest.api.InfotrygdEndringKode
 import no.nav.familie.ef.infotrygd.replika.rest.api.InfotrygdSakstype
 import no.nav.familie.ef.infotrygd.replika.rest.api.PeriodeRequest
 import org.assertj.core.api.Assertions.assertThat
@@ -105,6 +106,23 @@ internal class PeriodeRepositoryTest {
         val perioder = hentPerioder()
         assertThat(perioder).hasSize(1)
         assertThat(perioder.first().second.inntektsgrunnlag).isEqualTo(0)
+    }
+
+    @Test
+    fun `velger kode fra t_endring-raden som sist ble oppdatert når vedtaket har flere endringskoder`() {
+        lagVedtak(stønadType = "EO", vedtakId = 1, stønadId = 1)
+        // lagVedtak har allerede satt inn en 'F ' (FØRSTEGANGSVEDTAK)-rad med default oppdatert-tidspunkt.
+        // Legger til en nyere 'O ' (OPPHØRT)-rad for samme vedtak_id, slik det observeres i produksjon
+        // når et vedtak i ettertid får registrert en avsluttende status.
+        jdbcTemplate.update(
+            "INSERT INTO t_endring (vedtak_id, kode, oppdatert) VALUES (?, 'O ', CURRENT_TIMESTAMP + INTERVAL '1 hour')",
+            1,
+        )
+
+        val perioder = hentPerioder()
+
+        assertThat(perioder).hasSize(1)
+        assertThat(perioder.first().second.kode).isEqualTo(InfotrygdEndringKode.OPPHØRT)
     }
 
     @Test

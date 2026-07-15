@@ -4,6 +4,7 @@ import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.Id
 import jakarta.persistence.Table
+import java.time.LocalDateTime
 
 @Suppress("unused") // brukes av hibernate for å generere hvilke tabeller som brukes
 @Entity
@@ -14,4 +15,8 @@ data class Endring(
     val id: Long,
     @Column(name = "KODE")
     val kode: String,
+    @Column(name = "OPPRETTET")
+    val opprettet: LocalDateTime?,
+    @Column(name = "OPPDATERT")
+    val oppdatert: LocalDateTime?,
 )
