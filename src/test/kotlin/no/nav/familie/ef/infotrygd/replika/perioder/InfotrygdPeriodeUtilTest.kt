@@ -1,6 +1,7 @@
 package no.nav.familie.ef.infotrygd.replika.perioder
 
 import no.nav.familie.ef.infotrygd.replika.perioder.InfotrygdPeriodeTestUtil.lagInfotrygdPeriode
+import no.nav.familie.ef.infotrygd.replika.rest.api.InfotrygdEndringKode
 import no.nav.familie.ef.infotrygd.replika.utils.InfotrygdPeriodeUtil.filtrerOgSorterPerioderFraInfotrygd
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -100,6 +101,30 @@ internal class InfotrygdPeriodeUtilTest {
 
         assertThat(nyePerioder).hasSize(1)
         assertThat(nyePerioder[0]).isEqualTo(periode)
+    }
+
+    @Test
+    internal fun `skal velge kode med høyest presedens når vedtaket har flere endringskoder`() {
+        // De to periodene representerer samme vedtak/rad i t_vedtak, men to ulike t_endring-rader
+        // (kun kode skiller de), derfor bygges den ene som en kopi av den andre.
+        val førstegangsvedtak = lagInfotrygdPeriode(kode = InfotrygdEndringKode.FØRSTEGANGSVEDTAK)
+        val opphørt = førstegangsvedtak.copy(kode = InfotrygdEndringKode.OPPHØRT)
+
+        val nyePerioder = filtrerOgSorterPerioderFraInfotrygd(listOf(førstegangsvedtak, opphørt))
+
+        assertThat(nyePerioder).hasSize(1)
+        assertThat(nyePerioder[0].kode).isEqualTo(InfotrygdEndringKode.OPPHØRT)
+    }
+
+    @Test
+    internal fun `skal velge overført ny løsning fremfor opphørt når vedtaket har flere endringskoder`() {
+        val opphørt = lagInfotrygdPeriode(kode = InfotrygdEndringKode.OPPHØRT)
+        val overførtNyLøsning = opphørt.copy(kode = InfotrygdEndringKode.OVERTFØRT_NY_LØSNING)
+
+        val nyePerioder = filtrerOgSorterPerioderFraInfotrygd(listOf(opphørt, overførtNyLøsning))
+
+        assertThat(nyePerioder).hasSize(1)
+        assertThat(nyePerioder[0].kode).isEqualTo(InfotrygdEndringKode.OVERTFØRT_NY_LØSNING)
     }
 
     @Test

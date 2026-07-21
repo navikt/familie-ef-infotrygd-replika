@@ -66,17 +66,6 @@ class PeriodeRepository(
            WHERE l.personnr IN (:personIdenter)
               AND v.kode_rutine IN (:stønadskoder)
               AND v.dato_innv_fom < v.dato_innv_tom
-              -- Et vedtak kan ha flere rader i t_endring (PK er vedtak_id og kode), for eksempel
-              -- når en sak i ettertid får en ny kode (opphørt eller overført ny løsning) i
-              -- tillegg til den opprinnelige. Vi velger da raden som sist ble oppdatert i
-              -- Infotrygd, for å reflektere den gjeldende statusen på vedtaket.
-              AND e.kode = (
-                  SELECT e2.kode
-                  FROM t_endring e2
-                  WHERE e2.vedtak_id = v.vedtak_id
-                  ORDER BY e2.oppdatert DESC NULLS LAST, e2.opprettet DESC NULLS LAST, e2.kode DESC
-                  LIMIT 1
-              )
            ORDER BY s.stonad_id ASC, vedtak_id ASC, dato_innv_fom DESC
       """,
             values,
