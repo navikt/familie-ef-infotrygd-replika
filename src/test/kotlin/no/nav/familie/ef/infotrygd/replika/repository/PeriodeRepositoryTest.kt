@@ -109,20 +109,20 @@ internal class PeriodeRepositoryTest {
     }
 
     @Test
-    fun `velger kode fra t_endring-raden som sist ble oppdatert når vedtaket har flere endringskoder`() {
+    fun `hentPerioder returnerer en rad per t_endring-kode når vedtaket har flere endringskoder`() {
         lagVedtak(stønadType = "EO", vedtakId = 1, stønadId = 1)
-        // lagVedtak har allerede satt inn en 'F ' (FØRSTEGANGSVEDTAK)-rad med default oppdatert-tidspunkt.
-        // Legger til en nyere 'O ' (OPPHØRT)-rad for samme vedtak_id, slik det observeres i produksjon
-        // når et vedtak i ettertid får registrert en avsluttende status.
-        jdbcTemplate.update(
-            "INSERT INTO t_endring (vedtak_id, kode, oppdatert) VALUES (?, 'O ', CURRENT_TIMESTAMP + INTERVAL '1 hour')",
-            1,
-        )
+        // lagVedtak har allerede satt inn en 'F ' (FØRSTEGANGSVEDTAK)-rad.
+        // Legger til en 'O ' (OPPHØRT)-rad for samme vedtak_id, slik det observeres i produksjon
+        // når et vedtak i ettertid får registrert en avsluttende status. hentPerioder() er rådata
+        // og skal fortsatt returnere begge radene - det er sammenslåingslogikken (InfotrygdPeriodeUtil)
+        // som avgjør hvilken kode som skal gjelde.
+        jdbcTemplate.update("INSERT INTO t_endring (vedtak_id, kode) VALUES (?, 'O ')", 1)
 
         val perioder = hentPerioder()
 
-        assertThat(perioder).hasSize(1)
-        assertThat(perioder.first().second.kode).isEqualTo(InfotrygdEndringKode.OPPHØRT)
+        assertThat(perioder).hasSize(2)
+        assertThat(perioder.map { it.second.kode })
+            .containsExactlyInAnyOrder(InfotrygdEndringKode.FØRSTEGANGSVEDTAK, InfotrygdEndringKode.OPPHØRT)
     }
 
     @Test

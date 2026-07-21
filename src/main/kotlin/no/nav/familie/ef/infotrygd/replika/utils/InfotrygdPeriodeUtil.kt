@@ -14,10 +14,38 @@ import java.time.LocalDate
 object InfotrygdPeriodeUtil {
     fun filtrerOgSorterPerioderFraInfotrygd(perioderFraInfotrygd: List<Periode>): List<Periode> =
         perioderFraInfotrygd
+            .velgKodeMedHøyestPresedensPerVedtak()
             .toSet()
             .map { brukOpphørsdatoSomTomHvisDenFinnes(it) }
             .filter { it.stønadTom > it.stønadFom } // Skal infotrygd rydde bort disse? (inkl de der opphørdato er før startdato)
             .sortedWith(compareBy<Periode>({ it.stønadId }, { it.vedtakId }, { it.stønadFom }).reversed())
+
+    /**
+     * Et vedtak kan ha flere rader i t_endring (PK er vedtak_id og kode), for eksempel når en sak i
+     * ettertid får en ny kode (opphørt eller overført ny løsning) i tillegg til den opprinnelige.
+     * Uten en deterministisk prioritering her ville hvilken av radene som "vinner" avhenge av
+     * databasens tilfeldige/udefinerte returrekkefølge (samme problem uavhengig av om det er Oracle
+     * eller Postgres), noe som førte til avvik mellom on-prem og GCP-replikaen for sammenslåtte perioder.
+     * Vi velger derfor koden med høyest presedens, samme prioritering som allerede gjøres klient-side
+     * i ef-sak-frontend (grupperInfotrygdperiode.ts) når flere endringer for samme vedtak vises.
+     * Vi grupperer på hele perioden (utenom kode) fremfor kun vedtakId, slik at vi kun slår sammen
+     * rader som faktisk er duplikater av samme vedtak (og ikke f.eks. ulike stønadId/vedtak som i
+     * praksis aldri vil dele vedtakId, men som enkelte tester bevisst konstruerer med samme id).
+     * NB: dette gjelder kun sammenslåtte perioder - hentPerioder() returnerer fortsatt alle radene,
+     * slik at konsumenter som viser rådata (f.eks. migreringsoversikten) fortsatt ser alle endringene.
+     */
+    private fun List<Periode>.velgKodeMedHøyestPresedensPerVedtak(): List<Periode> =
+        groupBy { it.copy(kode = InfotrygdEndringKode.NY) }
+            .values
+            .map { perioderMedUlikKode -> perioderMedUlikKode.maxBy { kodePresedens(it.kode) } }
+
+    private fun kodePresedens(kode: InfotrygdEndringKode): Int =
+        when (kode) {
+            InfotrygdEndringKode.OVERTFØRT_NY_LØSNING -> 3
+            InfotrygdEndringKode.UAKTUELL -> 2
+            InfotrygdEndringKode.OPPHØRT -> 1
+            else -> 0
+        }
 
     private fun brukOpphørsdatoSomTomHvisDenFinnes(it: Periode): Periode {
         val opphørsdato = it.opphørsdato
