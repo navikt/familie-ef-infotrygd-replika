@@ -49,7 +49,7 @@
             Pga kritisk sårbarhet: overstyrer for å tvinge bruk av sikker versjon av netty og tomcat.
             Kan fjernes etter oppdatering av spring-boot-starter-parent til > 4.0.6
         -->
-        <netty.version>4.2.13.Final</netty.version>
+        <netty.version>4.2.15.Final</netty.version>
         <tomcat.version>11.0.22</tomcat.version>
     </properties>
 
