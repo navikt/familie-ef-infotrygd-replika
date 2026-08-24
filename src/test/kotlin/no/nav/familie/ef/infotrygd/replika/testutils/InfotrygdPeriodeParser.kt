@@ -1,6 +1,8 @@
 package no.nav.familie.ef.infotrygd.replika.testutils
 
-import com.github.doyaaaaaken.kotlincsv.dsl.csvReader
+import com.jsoizo.kotlincsv.csvReader
+import com.jsoizo.kotlincsv.reader.read
+import com.jsoizo.kotlincsv.reader.withHeader
 import no.nav.familie.ef.infotrygd.replika.perioder.InternPeriode
 import no.nav.familie.ef.infotrygd.replika.perioder.tilInternPeriode
 import no.nav.familie.ef.infotrygd.replika.rest.api.InfotrygdEndringKode
@@ -33,7 +35,7 @@ object InfotrygdPeriodeParser {
 
     fun parse(url: URL): InfotrygdTestData {
         val fileContent = url.openStream()!!
-        val rows: List<Map<String, String>> = csvReader().readAllWithHeader(fileContent)
+        val rows: List<Map<String, String>> = csvReader().read(fileContent) { it.withHeader().toList() }
 
         val inputOutput =
             rows
