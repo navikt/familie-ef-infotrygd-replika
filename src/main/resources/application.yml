@@ -37,7 +37,10 @@ spring:
 springdoc:
   packagesToScan: no.nav.familie.ef.infotrygd.replika
   pathsToMatch: /v3/api-docs,/api/**
+  api-docs:
+    enabled: false
   swagger-ui:
+    enabled: false
     disable-swagger-default-url: true
 
 

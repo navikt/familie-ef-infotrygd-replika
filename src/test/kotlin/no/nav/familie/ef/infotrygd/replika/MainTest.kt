@@ -23,19 +23,4 @@ class MainTest {
     fun `health-endepunktet svarer 200 uten autentisering`() {
         mockMvc.get("/internal/health").andExpect { status { isOk() } }
     }
-
-    @Test
-    fun `swagger-ui skal være tilgjengelig`() {
-        mockMvc.get("/swagger-ui/index.html").andExpect { status { isOk() } }
-    }
-
-    @Test
-    fun `api-docs skal inneholde openapi-spesifikasjon`() {
-        mockMvc
-            .get("/v3/api-docs")
-            .andExpect {
-                status { isOk() }
-                content { contentType(org.springframework.http.MediaType.APPLICATION_JSON) }
-            }
-    }
 }

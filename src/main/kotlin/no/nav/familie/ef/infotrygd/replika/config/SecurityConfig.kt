@@ -33,9 +33,6 @@ class SecurityConfig(
                     .requestMatchers(
                         "/internal/**",
                         "/api/ping",
-                        "/swagger-ui/**",
-                        "/swagger-ui.html",
-                        "/v3/api-docs/**",
                         "/tables",
                         "/tables2",
                     ).permitAll()
