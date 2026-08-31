@@ -81,5 +81,3 @@ spec:
       value: https://historisk-exodus-ef.dev-fss-pub.nais.io
     - name: EXODUS_SCOPE
       value: api://dev-fss.teamfamilie.historisk-exodus-ef/.default
-    - name: EXODUS_SCHEDULER_ENABLED
-      value: "true"
