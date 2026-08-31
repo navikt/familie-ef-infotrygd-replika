@@ -24,7 +24,6 @@ spec:
   replicas:
     min: 2
     max: 2
-  leaderElection: true
   tokenx:
     enabled: true
   resources:
@@ -56,13 +55,6 @@ spec:
       rules:
         - application: logging
           namespace: nais-system
-        - application: historisk-exodus-ef
-          namespace: teamfamilie
-          cluster: dev-fss
-      # historisk-exodus kjører on-prem (FSS) og er ikke en NAIS-app i denne (GCP-)klyngen, så
-      # kallet må åpnes som ekstern host. Må matche EXODUS_BASE_URL under.
-      external:
-        - host: historisk-exodus-ef.dev-fss-pub.nais.io
   azure:
     application:
       enabled: true
@@ -77,7 +69,3 @@ spec:
   env:
     - name: SPRING_PROFILES_ACTIVE
       value: dev
-    - name: EXODUS_BASE_URL
-      value: https://historisk-exodus-ef.dev-fss-pub.nais.io
-    - name: EXODUS_SCOPE
-      value: api://dev-fss.teamfamilie.historisk-exodus-ef/.default
