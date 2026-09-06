@@ -7,7 +7,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>4.1.0</version>
+        <version>4.1.1</version>
         <relativePath/>
     </parent>
     <repositories>
@@ -43,7 +43,7 @@
         <mockk.version>1.14.11</mockk.version>
         <springdoc.version>3.1.0</springdoc.version>
         <nav-foedselsnummer.version>1.0-SNAPSHOT.6</nav-foedselsnummer.version>
-        <kontrakter.version>4.0_20260730124851_08988e0</kontrakter.version>
+        <kontrakter.version>4.0_20260821102510_33ea755</kontrakter.version>
 
         <!--
             Pga kritisk sårbarhet: overstyrer for å tvinge bruk av sikker versjon av netty og tomcat.
